@@ -30,7 +30,7 @@ const App = () => {
   return (
     <Container maxWidth="md">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
-      <Box mb={4}><Alert severity="warning">This is a Bitcoin Testnet4 application</Alert></Box>
+      <Box mb={4}><Alert severity="warning">This is a Bitcoin Testnet4 application. Code at https://github.com/2seaq/blockinos</Alert></Box>
         <Box textAlign="center" mb={4}>
           <Typography variant="h3" component="h1" color="primary">
             Blockinos Pizza
