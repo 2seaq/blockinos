@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { io } from 'socket.io-client';
-import config from '../config.json';
 import crypto from 'crypto-browserify';
 import {
     Box,
@@ -12,10 +11,7 @@ import {
     Button
 } from '@mui/material';
 
-const rune = config.rune;
-const clnsocket = config.clnsocket;
-
-const InvoiceStatus = ({ invoice, order }) => {
+const InvoiceStatus = ({ invoice, order, onClose }) => {
     const [status, setStatus] = useState('Pending');
     const [preimage, setPreimage] = useState(null);
 
@@ -25,10 +21,9 @@ const InvoiceStatus = ({ invoice, order }) => {
     const orderpaymenthash = invoice.payment_hash;
 
     useEffect(() => {
-        const socket = io.connect(clnsocket, {
-            extraHeaders: {
-                rune: rune,
-            },
+        const socket = io('https://blockinos.osys.com', {
+            path: '/socket.io/',
+            transports: ['websocket'],
         });
 
         socket.on('connect', () => {
@@ -40,8 +35,6 @@ const InvoiceStatus = ({ invoice, order }) => {
         });
 
         socket.on('message', (data) => {
-            console.log('WebSocket message:', data);
-
             try {
                 const message = typeof data === 'string' ? JSON.parse(data) : data;
 
@@ -52,7 +45,6 @@ const InvoiceStatus = ({ invoice, order }) => {
                     if (computedHash === orderpaymenthash) {
                         setStatus('Paid');
                         setPreimage(paymentPreimage);
-                        console.log('Invoice paid:', message.invoice_payment);
                     } else {
                         console.log('Invoice payment received but details do not match.');
                     }
@@ -71,6 +63,14 @@ const InvoiceStatus = ({ invoice, order }) => {
         };
     }, [label, msat, orderpaymenthash]);
 
+    const handleClose = () => {
+        setStatus('Empty');
+        setPreimage(null);
+        if (onClose) {
+            onClose();
+        }
+    };
+
     return (
         <Box>
             <Typography variant="h5" component="h3" gutterBottom>
@@ -88,7 +88,6 @@ const InvoiceStatus = ({ invoice, order }) => {
                         </Typography>
                         <QRCodeCanvas value={bolt11} size={256} />
 
-                        {/* Display bolt11 in a copyable TextField */}
                         <Box sx={{ marginTop: 2 }}>
                             <Typography variant="body2" gutterBottom>
                                 Invoice (bolt11):
@@ -108,46 +107,50 @@ const InvoiceStatus = ({ invoice, order }) => {
                                     variant="contained"
                                     size="small"
                                     onClick={() => {
-                                        try {
-                                            // Use clipboard API if available
-                                            if (navigator.clipboard && navigator.clipboard.writeText) {
-                                                navigator.clipboard.writeText(bolt11);
-                                                alert('Copied to clipboard!');
-                                            } else {
-                                                // Fallback for unsupported browsers
-                                                const tempInput = document.createElement('input');
-                                                tempInput.value = bolt11;
-                                                document.body.appendChild(tempInput);
-                                                tempInput.select();
-                                                document.execCommand('copy');
-                                                document.body.removeChild(tempInput);
-                                                alert('Copied to clipboard!');
-                                            }
-                                        } catch (err) {
-                                            console.error('Copy failed', err);
+                                        navigator.clipboard.writeText(bolt11).then(() => {
+                                            alert('Copied to clipboard!');
+                                        }).catch(() => {
                                             alert('Failed to copy');
-                                        }
+                                        });
                                     }}
                                 >
                                     Copy
                                 </Button>
                             </Box>
                         </Box>
+
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={handleClose}
+                            sx={{ marginTop: 2 }}
+                        >
+                            Close
+                        </Button>
                     </Paper>
                 </Backdrop>
-
-
             )}
 
             {status === 'Paid' && preimage && (
-                <Box mt={2}>
-                    <Typography variant="h6" color="success.main">
-                        Invoice has been paid!
-                    </Typography>
-                    <Typography variant="body2" sx={{ marginTop: 1 }}>
-                        Preimage: <code>{preimage}</code>
-                    </Typography>
-                </Box>
+                <Backdrop open={true} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                    <Paper sx={{ padding: 4, textAlign: 'center', backgroundColor: 'green', color: 'white' }}>
+                        <Typography variant="h6">
+                            Invoice has been paid!
+                        </Typography>
+                        <Typography variant="body2" sx={{ marginTop: 2 }}>
+                            Preimage: <code>{preimage}</code>
+                        </Typography>
+
+                        <Button
+                            variant="outlined"
+                            color="inherit"
+                            onClick={handleClose}
+                            sx={{ marginTop: 2 }}
+                        >
+                            Close
+                        </Button>
+                    </Paper>
+                </Backdrop>
             )}
         </Box>
     );

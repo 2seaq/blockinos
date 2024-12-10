@@ -3,10 +3,6 @@ import { Container, Typography, Box, Paper } from '@mui/material';
 import OrderPizza from './components/OrderPizza';
 import InvoiceStatus from './components/InvoiceStatus';
 import Alert from '@mui/material/Alert';
-//import CheckIcon from '@mui/icons-material/Check';
-import config from '../config.json';
-
-const pizzaserver = config.pizzaserver;
 
 const App = () => {
   const [invoice, setInvoice] = useState(null);
@@ -14,7 +10,7 @@ const App = () => {
 
   const handleCheckout = async (orderIn) => {
     try {
-      const response = await fetch(`${pizzaserver}/create-invoice`, {
+      const response = await fetch('https://blockinos.osys.com/api/create-invoice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderIn),
@@ -27,10 +23,17 @@ const App = () => {
     }
   };
 
+  const resetApplication = () => {
+    setInvoice(null);
+    setOrder(null);
+  };
+
   return (
     <Container maxWidth="md">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
-      <Box mb={4}><Alert severity="warning">This is a Bitcoin Testnet4 application. Code at https://github.com/2seaq/blockinos</Alert></Box>
+        <Box mb={4}>
+          <Alert severity="warning">This is a Bitcoin Testnet4 application. Code at https://github.com/2seaq/blockinos</Alert>
+        </Box>
         <Box textAlign="center" mb={4}>
           <Typography variant="h3" component="h1" color="primary">
             Blockinos Pizza
@@ -39,7 +42,7 @@ const App = () => {
         <OrderPizza onCheckout={handleCheckout} />
         {invoice && (
           <Box mt={4}>
-            <InvoiceStatus invoice={invoice} order={order} />
+            <InvoiceStatus invoice={invoice} order={order} onClose={resetApplication} />
           </Box>
         )}
       </Paper>
