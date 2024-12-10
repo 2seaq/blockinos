@@ -5,16 +5,17 @@ const cors = require('cors');
 const axios = require('axios');
 const WebSocket = require('ws');
 
-
 const app = express();
+app.set('trust proxy', true);
 app.use(cors());
 app.use(bodyParser.json());
+
 
 const rune = config.rune;
 const LNREST_URL = config.LNREST_URL; // Update with Core Lightning REST URL
 
 // Generate a Lightning Invoice
-app.post('/create-invoice', async (req, res) => {
+app.post('/api/create-invoice', async (req, res) => {
     const { amount, description } = req.body;
     try {
         const response = await axios.post(`${LNREST_URL}/v1/invoice`, {
