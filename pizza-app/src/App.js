@@ -4,6 +4,7 @@ import OrderPizza from './components/OrderPizza';
 import InvoiceStatus from './components/InvoiceStatus';
 import Alert from '@mui/material/Alert';
 
+
 const App = () => {
   const [invoice, setInvoice] = useState(null);
   const [order, setOrder] = useState(null);
@@ -32,13 +33,23 @@ const App = () => {
     <Container maxWidth="md">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
         <Box mb={4}>
-          <Alert severity="warning">This is a Bitcoin Testnet4 application. Code at https://github.com/2seaq/blockinos</Alert>
+          <Alert severity="warning">This is a Bitcoin Lightning Testnet4 application. Code at https://github.com/2seaq/blockinos</Alert>
         </Box>
         <Box textAlign="center" mb={4}>
-          <Typography variant="h3" component="h1" color="primary">
-            Blockinos Pizza
-          </Typography>
-        </Box>
+  <Typography
+    variant="h3"
+    component="h1"
+    sx={{
+      fontWeight: 800,
+      letterSpacing: 2,
+      fontFamily: `'Pacifico', cursive`, // Use a fun logo-style font
+      color: 'primary.main',
+      textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
+    }}
+  >
+    🍕 Blockinos Pizza
+  </Typography>
+</Box>
         <OrderPizza onCheckout={handleCheckout} />
         {invoice && (
           <Box mt={4}>
