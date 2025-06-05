@@ -33,7 +33,8 @@ const App = () => {
     <Container maxWidth="md">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
         <Box mb={4}>
-          <Alert severity="warning">This is a Bitcoin Lightning Testnet4 application. Code at https://github.com/2seaq/blockinos</Alert>
+          <Alert severity="info">This is a Bitcoin Lightning Testnet4 application. Code at https://github.com/2seaq/blockinos</Alert>
+          <Alert severity="info">Visit www.osys.com for details on testnet lightning nodes to connect to.</Alert>
         </Box>
         <Box textAlign="center" mb={4}>
   <Typography
